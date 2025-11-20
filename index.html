@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Pop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            background-color: #d9d9d9;
+            color: #0a1d3a;
+            font-family: Arial, sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        .navbar {
+            background-color: #0a1d3a;
+        }
+
+        .navbar button {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-weight: bold;
+            margin-right: 20px;
+            transition: color 0.3s;
+        }
+
+        .navbar button:hover {
+            color: #d9d9d9;
+            cursor: pointer;
+        }
+        
+        /* Estilo para el nuevo botón de admin */
+        .btn-admin {
+            background-color: #ffc107; /* Amarillo de advertencia */
+            color: #0a1d3a;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 0.95rem;
+        }
+
+        .foto-principal {
+            border: 3px solid #0a1d3a;
+            border-radius: 10px;
+            width: 85%;
+            height: 450px;
+            margin: 40px auto;
+            overflow: hidden;
+            scroll-margin-top: 100px;
+        }
+
+        .foto-principal img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .titulo-seccion {
+            color: #19104e;
+            font-weight: bold;
+            margin-top: 40px;
+            font-size: 1.8rem;
+        }
+
+        .galeria {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .galeria.cartelera img {
+            width: 300px;
+            height: 420px;
+            border: 3px solid #0a1d3a;
+            border-radius: 10px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .galeria.complejos img {
+            width: 500px;
+            height: 320px;
+            border: 3px solid #0a1d3a;
+            border-radius: 10px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .galeria img:hover {
+            transform: scale(1.05);
+            cursor: pointer;
+        }
+
+        footer {
+            background-color: #0a1d3a;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: 50px;
+        }
+
+        .complejo p {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-sm fixed-top">
+        <div class="container-fluid">
+            <button class="navbar-brand text-white" id="btnInicio">Movie Pop</button>
+            <div class="ms-auto d-flex align-items-center">
+                <button id="btnInformesVenta" 
+                        class="btn-admin me-3" 
+                        style="display: none;">
+                    <i class="bi bi-bar-chart-fill"></i> Informes
+                </button>
+                
+                <button id="btnPelis">CARTELERA</button>
+                <button id="btnComplejos">COMPLEJOS</button>
+                <button id="btnEntradas">ENTRADAS</button>
+                <button id="btnLogin">LOGIN</button> 
+            </div>
+        </div>
+    </nav>
+
+    <div class="foto-principal" id="inicio">
+        <img src="Foto principal cine.png" alt="Foto principal cine">
+    </div>
+
+    <div class="text-center" id="cartelera">
+        <h3 class="titulo-seccion">CARTELERA</h3>
+        <div class="galeria cartelera">
+            <img src="volveralfuturo.png" alt="Volver al Futuro" id="volver">
+            <img src="starwars.png" alt="Star Wars" id="starwars">
+            <img src="harrypotter.png" alt="Harry Potter" id="harry">
+            <img src="gigantesdeacero.png" alt="Gigantes de Acero" id="gigantes">
+        </div>
+    </div>
+
+    <div class="text-center" id="complejos">
+        <h3 class="titulo-seccion">COMPLEJOS</h3>
+        <div class="galeria complejos">
+            <div class="complejo">
+                <img src="sucursalabasto.jpg" alt="Complejo Abasto">
+                <p>Movie Pop Abasto Shopping, AV. Corrientes 3247</p>
+            </div>
+            <div class="complejo">
+                <img src="sucursalcaballito.jpg" alt="Complejo Caballito">
+                <p>Movie Pop Caballito, AV. Rivadavia 5071</p>
+            </div>
+            <div class="complejo">
+                <img src="sucursaldot.jpg" alt="Complejo DOT">
+                <p>Movie Pop Shopping DOT, Vedia 3626</p>
+            </div>
+            <div class="complejo">
+                <img src="sucursalrecoleta.jpg" alt="Complejo Recoleta">
+                <p>Movie Pop Recoleta, Vicente Lopez 2050</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Movie Pop - Todos los derechos reservados</p>
+    </footer>
+
+    <script>
+        // --- NAVEGACIÓN BÁSICA ---
+        document.getElementById("btnInicio").onclick = () => document.getElementById("inicio").scrollIntoView({behavior: "smooth"});
+        document.getElementById("btnPelis").onclick = () => document.getElementById("cartelera").scrollIntoView({behavior: "smooth"});
+        document.getElementById("btnComplejos").onclick = () => document.getElementById("complejos").scrollIntoView({behavior: "smooth"});
+        
+        document.getElementById("btnEntradas").onclick = () => window.location.href = "entradas.html";
+
+        document.getElementById("volver").onclick = () => window.location.href = "volveralfuturo.html";
+        document.getElementById("starwars").onclick = () => window.location.href = "starwars.html";
+        document.getElementById("harry").onclick = () => window.location.href = "harrypotter.html";
+        document.getElementById("gigantes").onclick = () => window.location.href = "gigantesdeacero.html";
+
+        // --- LÓGICA DE SESIÓN Y ADMIN (ACTUALIZADA) ---
+        document.addEventListener("DOMContentLoaded", () => {
+            const usuarioLogueado = JSON.parse(localStorage.getItem('usuarioLogueado'));
+            const btnLogin = document.getElementById("btnLogin");
+            const btnInformes = document.getElementById("btnInformesVenta"); // Nuevo botón
+
+            if (usuarioLogueado) {
+                // CASO A: Usuario está logueado
+                btnLogin.innerText = "HOLA, " + usuarioLogueado.nombre.toUpperCase();
+                
+                // 1. Mostrar/Ocultar el botón de informes
+                if (usuarioLogueado.role === 'admin') {
+                    btnInformes.style.display = 'inline-block';
+                    // 2. Definir la acción del botón de informes
+                    btnInformes.onclick = () => window.location.href = "admin.html";
+                } else {
+                    btnInformes.style.display = 'none';
+                }
+                
+                // 3. Comportamiento al cerrar sesión
+                btnLogin.onclick = () => {
+                    if(confirm("¿Deseas cerrar sesión?")) {
+                        localStorage.removeItem('usuarioLogueado'); 
+                        window.location.reload(); 
+                    }
+                };
+            } else {
+                // CASO B: No hay nadie logueado
+                btnLogin.innerText = "LOGIN";
+                btnLogin.onclick = () => window.location.href = "login.html";
+                btnInformes.style.display = 'none'; // Asegurar que esté oculto
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

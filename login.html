@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceso - Movie Pop</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <style>
+    body {
+        background-color: #0a1d3a;
+        color: #d9d9d9;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+    .login-container {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        max-width: 400px;
+        width: 100%;
+    }
+    .login-container h2 {
+        color: #0a1d3a;
+        font-weight: bold;
+    }
+    .form-control {
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+    .btn-custom {
+        background-color: #0a1d3a;
+        color: white;
+        font-weight: bold;
+        padding: 10px;
+        transition: background-color 0.3s;
+    }
+    .btn-custom:hover {
+        background-color: #152b52;
+        color: white;
+    }
+    .text-link {
+        color: #0a1d3a;
+        cursor: pointer;
+        text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    
+    <div id="loginForm">
+        <h2 class="text-center mb-4"><i class="bi bi-person-circle"></i> INICIAR SESIÓN</h2>
+        
+        <div class="mb-3">
+            <label for="inputEmail" class="form-label text-dark">Email:</label>
+            <input type="email" class="form-control" id="inputEmail" placeholder="ejemplo@mail.com">
+        </div>
+        
+        <div class="mb-4">
+            <label for="inputPass" class="form-label text-dark">Contraseña:</label>
+            <input type="password" class="form-control" id="inputPass" placeholder="Contraseña">
+        </div>
+        
+        <button class="btn btn-custom w-100 mb-3" onclick="loginUser()">Entrar</button>
+        
+        <p class="text-center text-dark small mt-3">
+            ¿No tienes cuenta? <a href="#" class="text-link fw-bold" onclick="toggleForm(true)">Regístrate aquí</a>.
+        </p>
+    </div>
+    
+    <div id="registerForm" style="display:none;">
+        <h2 class="text-center mb-4"><i class="bi bi-person-plus-fill"></i> REGISTRARSE</h2>
+
+        <div class="mb-3">
+            <label for="inputNameReg" class="form-label text-dark">Nombre:</label>
+            <input type="text" class="form-control" id="inputNameReg" placeholder="Tu Nombre">
+        </div>
+        
+        <div class="mb-3">
+            <label for="inputEmailReg" class="form-label text-dark">Email:</label>
+            <input type="email" class="form-control" id="inputEmailReg" placeholder="email@nuevo.com">
+        </div>
+        
+        <div class="mb-4">
+            <label for="inputPassReg" class="form-label text-dark">Contraseña:</label>
+            <input type="password" class="form-control" id="inputPassReg" placeholder="Contraseña (mín. 4)">
+        </div>
+        
+        <button class="btn btn-success w-100 mb-3" onclick="registerUser()">Registrar Cuenta</button>
+
+        <p class="text-center text-dark small mt-3">
+            ¿Ya tienes cuenta? <a href="#" class="text-link fw-bold" onclick="toggleForm(false)">Inicia sesión</a>.
+        </p>
+    </div>
+
+    <p class="text-center text-dark">
+        <a href="#" class="text-link small" onclick="mostrarDatos()">Ver notas de prueba</a>
+    </p>
+    <div id="datosPrueba" class="alert alert-info mt-3" style="display:none; font-size: 0.8rem;">
+        <p class="mb-1 fw-bold">Prueba en BBDD:</p>
+        <p class="mb-1">Debes **registrar un usuario** en el formulario de registro y usar su email/contraseña para iniciar sesión.</p>
+    </div>
+  </div>
+
+  <script>
+    // Usamos estas claves para la simulación de sesión que tu index.html espera
+    const STORAGE_KEY = 'usersMoviePop'; 
+    const SESSION_KEY = 'usuarioLogueado';
+
+    function toggleForm(showRegister) {
+        document.getElementById('loginForm').style.display = showRegister ? 'none' : 'block';
+        document.getElementById('registerForm').style.display = showRegister ? 'block' : 'none';
+    }
+
+    // Mantiene la simulación de admin en localStorage para que tu index.html funcione
+    function initializeUsers() {
+        let users = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (!users || users.length === 0 || !users.some(u => u.email === 'admin@movie.com')) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify([
+                { nombre: "Admin", email: "admin@movie.com", pass: "1234", role: 'admin' }, 
+                { nombre: "Juan", email: "juan@mail.com", pass: "123", role: 'user' }
+            ]));
+        }
+    }
+    initializeUsers();
+
+
+    function registerUser() {
+        const name = document.getElementById('inputNameReg').value.trim();
+        const email = document.getElementById('inputEmailReg').value.trim();
+        const pass = document.getElementById('inputPassReg').value.trim();
+
+        if (!name || !email || !pass) {
+            alert("Todos los campos son obligatorios.");
+            return;
+        }
+        if (pass.length < 4) {
+             alert("La contraseña debe tener al menos 4 caracteres.");
+            return;
+        }
+
+        // 1. Prepara los datos para ser enviados al script PHP (Backend)
+        const formData = new FormData();
+        formData.append('nombre', name);
+        formData.append('email', email);
+        formData.append('pass', pass); 
+
+        // 2. Envía el REGISTRO al script PHP (registro_socio_db.php)
+        fetch('registro_socio_db.php', {
+            method: 'POST',
+            body: formData 
+        })
+        .then(response => {
+            if (!response.ok) {
+                // Si hay un error de servidor (ej. 500), lee el mensaje de error de PHP
+                return response.json().then(errorData => {
+                    throw new Error(errorData.message || 'Error desconocido al registrar.');
+                });
+            }
+            return response.json(); 
+        })
+        .then(data => {
+            if (data.success) {
+                alert(`¡Registro exitoso! Ya puedes iniciar sesión, ${name}.`);
+                
+                // Limpiar y cambiar a la vista de login
+                document.getElementById('inputEmail').value = email; 
+                document.getElementById('inputNameReg').value = '';
+                document.getElementById('inputEmailReg').value = '';
+                document.getElementById('inputPassReg').value = '';
+                toggleForm(false); 
+            } else {
+                alert("Error: " + data.message); // Muestra el error de BBDD
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            alert(`Ocurrió un error de conexión: ${error.message}`);
+        });
+    }
+
+
+    function loginUser() {
+      const email = document.getElementById('inputEmail').value.trim();
+      const pass = document.getElementById('inputPass').value.trim();
+
+      if (!email || !pass) {
+        alert("Por favor, ingresa email y contraseña.");
+        return;
+      }
+      
+      const formData = new FormData();
+      formData.append('email', email);
+      formData.append('pass', pass);
+
+      // 3. Envía el LOGIN al script PHP (login_socio_db.php)
+      fetch('login_socio_db.php', {
+          method: 'POST',
+          body: formData 
+      })
+      .then(response => {
+          if (!response.ok) {
+              return response.json().then(errorData => {
+                  throw new Error(errorData.message || 'Error en el servidor.');
+              });
+          }
+          return response.json();
+      })
+      .then(data => {
+          if (data.success) {
+              alert(`¡Bienvenido, ${data.nombre}!`);
+              
+              // Almacenamos la sesión en localStorage para que index.html lea el nombre/rol
+              const userSession = {
+                  nombre: data.nombre, 
+                  email: email, 
+                  role: data.role // El rol viene determinado por el script PHP
+              };
+              localStorage.setItem(SESSION_KEY, JSON.stringify(userSession));
+              
+              window.location.href = "index.html"; 
+              
+          } else {
+              alert(data.message || "Credenciales incorrectas o error desconocido.");
+          }
+      })
+      .catch(error => {
+          console.error('Fetch error:', error);
+          alert(`Ocurrió un error de conexión: ${error.message}`);
+      });
+    }
+
+    function mostrarDatos() {
+        const datosDiv = document.getElementById('datosPrueba');
+        datosDiv.style.display = datosDiv.style.display === 'none' ? 'block' : 'none';
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

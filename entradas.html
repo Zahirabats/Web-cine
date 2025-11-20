@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reservar Butacas - Movie Pop</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <style>
+    body {
+      background-color: #d9d9d9;
+      color: #0a1d3a;
+      font-family: Arial, sans-serif;
+    }
+
+    .navbar { background-color: #0a1d3a; }
+    .navbar button {
+      background: none; border: none; color: #ffffff;
+      font-weight: bold; margin-right: 20px;
+    }
+    
+    .compra-container { margin-top: 80px; margin-bottom: 50px; }
+    
+    .card-compra {
+      border: 3px solid #0a1d3a; border-radius: 15px;
+      overflow: hidden; background: white;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+    
+    .card-header-custom {
+      background-color: #0a1d3a; color: white;
+      padding: 15px; text-align: center; font-size: 1.5rem; font-weight: bold;
+    }
+
+    .pantalla {
+      background-color: #ccc; height: 30px; width: 100%; margin: 15px 0;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+      transform: perspective(300px) rotateX(-5deg);
+      text-align: center; line-height: 30px; color: #555; letter-spacing: 5px;
+    }
+
+    .sala-cine { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .fila { display: flex; gap: 10px; }
+
+    .butaca {
+      width: 30px; height: 30px;
+      border-top-left-radius: 10px; border-top-right-radius: 10px;
+      background-color: #fff; border: 2px solid #0a1d3a;
+      cursor: pointer; transition: 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6rem; color: transparent;
+    }
+
+    .butaca:hover { color: #0a1d3a; transform: scale(1.2); }
+    .butaca.seleccionada { background-color: #0a1d3a; border-color: #0a1d3a; }
+    .butaca.ocupada {
+      background-color: #b71c1c; border-color: #b71c1c;
+      cursor: not-allowed; pointer-events: none;
+    }
+
+    .referencias { display: flex; justify-content: center; gap: 15px; margin-top: 20px; font-size: 0.9rem; }
+    .dot { width: 15px; height: 15px; display: inline-block; margin-right: 5px; border-radius: 3px; }
+    .dot-free { border: 2px solid #0a1d3a; }
+    .dot-sel { background-color: #0a1d3a; }
+    .dot-occ { background-color: #b71c1c; }
+
+    .ticket-preview { background-color: #f8f9fa; border-left: 3px dashed #0a1d3a; height: 100%; padding: 20px; }
+    .item-entrada { background: white; border: 1px solid #dee2e6; border-radius: 5px; padding: 8px; margin-bottom: 8px; }
+    .precio-total { font-size: 2rem; font-weight: bold; color: #0a1d3a; }
+    .btn-comprar { background-color: #0a1d3a; color: white; font-weight: bold; width: 100%; padding: 10px; }
+    .btn-comprar:hover { color: #d9d9d9; background-color: #152b52; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-sm fixed-top">
+    <div class="container-fluid">
+      <button class="navbar-brand text-white" onclick="window.location.href='index.html'">Movie Pop</button>
+      <div class="ms-auto">
+        <button onclick="window.location.href='index.html'">VOLVER</button>
+        <button id="btnUserDisplay">LOGIN</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container compra-container">
+    <div class="card-compra">
+      <div class="card-header-custom">RESERVA DE BUTACAS</div>
+      <div class="row g-0">
+        
+        <div class="col-md-7 p-4">
+            <div class="row mb-3 g-2">
+                <div class="col-12">
+                    <label class="fw-bold">Película</label>
+                    <select class="form-select" id="selectPelicula" onchange="cargarSala()">
+                        <option value="Volver al Futuro">Volver al Futuro</option>
+                        <option value="Star Wars">Star Wars</option>
+                        <option value="Harry Potter">Harry Potter</option>
+                        <option value="Gigantes de Acero">Gigantes de Acero</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="fw-bold">Complejo</label>
+                    <select class="form-select" id="selectComplejo" onchange="cargarSala()">
+                        <option value="Abasto">Abasto Shopping</option>
+                        <option value="Caballito">Caballito</option>
+                        <option value="DOT">Shopping DOT</option>
+                        <option value="Recoleta">Recoleta</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="fw-bold">Sala</label>
+                    <select class="form-select" id="selectSala" onchange="cargarSala()">
+                        <option value="Sala 1">Sala 1 (2D Tradicional)</option>
+                        <option value="Sala 2">Sala 2 (3D Surround)</option>
+                        <option value="Sala 3">Sala 3 (4D E-Motion)</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="fw-bold">Fecha</label>
+                    <input type="date" id="inputFecha" class="form-control" onchange="cargarSala()">
+                </div>
+                <div class="col-md-6">
+                    <label class="fw-bold">Horario</label>
+                    <select class="form-select" id="selectHora" onchange="cargarSala()">
+                        <option value="16:00">16:00</option>
+                        <option value="19:30">19:30</option>
+                        <option value="22:00">22:00</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="text-center fw-bold mb-1">PANTALLA</div>
+            <div class="pantalla"></div>
+            <div class="sala-cine" id="contenedorButacas"></div>
+            
+            <div class="referencias">
+                <span><span class="dot dot-free"></span> Libre</span>
+                <span><span class="dot dot-sel"></span> Tu Selección</span>
+                <span><span class="dot dot-occ"></span> Ocupado</span>
+            </div>
+        </div>
+
+        <div class="col-md-5 ticket-preview d-flex flex-column">
+            <h4 class="fw-bold text-center"><i class="bi bi-cart4"></i> TUS ENTRADAS</h4>
+            <hr>
+            <div id="infoPrecios" class="alert alert-info py-2 text-center" style="font-size: 0.85rem;"></div>
+            <div id="listaEntradas" style="flex-grow: 1; max-height: 300px; overflow-y: auto;">
+                <p class="text-center text-muted mt-4">Selecciona butacas en el mapa</p>
+            </div>
+            <div class="mt-auto text-center">
+                <hr>
+                <small>Total a Pagar:</small>
+                <div class="precio-total" id="precioTotal">$0</div>
+                <button class="btn btn-comprar mt-3" onclick="procesarCompra()">CONFIRMAR Y PAGAR</button>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- CONFIGURACIÓN DE PRECIOS ---
+    const PRECIOS_BASE = { 'normal': 5000, 'jubilado': 3500, 'nino': 2000 };
+    const RECARGO_3D = 1000;
+    const RECARGO_4D = 2000;
+    
+    const FILAS = 6; 
+    const ASIENTOS_POR_FILA = 8;
+    const STORAGE_RESERVAS = 'moviePop_reservas_v2'; 
+    const STORAGE_VENTAS = 'moviePop_ventas'; // Key para reportes
+
+    let carrito = [];
+    let butacasOcupadasActuales = [];
+    let idFuncionActual = ""; 
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const usuario = JSON.parse(localStorage.getItem('usuarioLogueado'));
+        const btnUser = document.getElementById('btnUserDisplay');
+        
+        if (usuario) {
+            btnUser.innerText = usuario.nombre.toUpperCase();
+        } else {
+            alert("Debes iniciar sesión para comprar.");
+            window.location.href = "login.html";
+        }
+
+        const hoy = new Date().toISOString().split("T")[0];
+        const inputFecha = document.getElementById('inputFecha');
+        inputFecha.min = hoy;
+        inputFecha.value = hoy;
+
+        cargarSala();
+    });
+
+    function cargarSala() {
+        carrito = [];
+        const peli = document.getElementById('selectPelicula').value;
+        const complejo = document.getElementById('selectComplejo').value;
+        const sala = document.getElementById('selectSala').value;
+        const fecha = document.getElementById('inputFecha').value;
+        const hora = document.getElementById('selectHora').value;
+        
+        idFuncionActual = `${peli}_${complejo}_${sala}_${fecha}_${hora}`;
+        actualizarInfoPrecios(sala);
+
+        const todasLasReservas = JSON.parse(localStorage.getItem(STORAGE_RESERVAS)) || {};
+        if (todasLasReservas[idFuncionActual]) {
+            butacasOcupadasActuales = todasLasReservas[idFuncionActual];
+        } else {
+            butacasOcupadasActuales = generarOcupadosAleatorios();
+            todasLasReservas[idFuncionActual] = butacasOcupadasActuales;
+            localStorage.setItem(STORAGE_RESERVAS, JSON.stringify(todasLasReservas));
+        }
+
+        dibujarGrilla();
+        renderizarCarrito();
+    }
+
+    function actualizarInfoPrecios(sala) {
+        const infoDiv = document.getElementById('infoPrecios');
+        if (sala === "Sala 3") {
+            infoDiv.innerHTML = `<strong><i class="bi bi-lightning-charge-fill"></i> 4D E-MOTION (+$2000):</strong><br>Normal: $${PRECIOS_BASE.normal + RECARGO_4D} | Jub: $${PRECIOS_BASE.jubilado + RECARGO_4D} | Niño: $${PRECIOS_BASE.nino + RECARGO_4D}`;
+            infoDiv.className = "alert alert-danger py-2 text-center";
+        } else if (sala === "Sala 2") {
+            infoDiv.innerHTML = `<strong><i class="bi bi-eyeglasses"></i> 3D DIGITAL (+$1000):</strong><br>Normal: $${PRECIOS_BASE.normal + RECARGO_3D} | Jub: $${PRECIOS_BASE.jubilado + RECARGO_3D} | Niño: $${PRECIOS_BASE.nino + RECARGO_3D}`;
+            infoDiv.className = "alert alert-warning py-2 text-center";
+        } else {
+            infoDiv.innerHTML = `<strong>Sala Tradicional:</strong><br>Normal: $${PRECIOS_BASE.normal} | Jub: $${PRECIOS_BASE.jubilado} | Niño: $${PRECIOS_BASE.nino}`;
+            infoDiv.className = "alert alert-info py-2 text-center";
+        }
+    }
+    
+    function generarOcupadosAleatorios() {
+        const ocupados = [];
+        const letras = ['A','B','C','D','E','F'];
+        for(let f=0; f<FILAS; f++) {
+            for(let a=0; a<ASIENTOS_POR_FILA; a++) {
+                if(Math.random() < 0.15) ocupados.push(`${letras[f]}${a+1}`);
+            }
+        }
+        return ocupados;
+    }
+
+    function dibujarGrilla() {
+        // ... (dibujar butacas)
+        const contenedor = document.getElementById('contenedorButacas');
+        contenedor.innerHTML = "";
+        for (let f = 0; f < FILAS; f++) {
+            const filaDiv = document.createElement('div');
+            filaDiv.classList.add('fila');
+            for (let a = 0; a < ASIENTOS_POR_FILA; a++) {
+                const butaca = document.createElement('div');
+                butaca.classList.add('butaca');
+                const letras = ['A','B','C','D','E','F','G'];
+                const nombreAsiento = `${letras[f]}${a + 1}`;
+                butaca.innerText = nombreAsiento;
+                if (butacasOcupadasActuales.includes(nombreAsiento)) {
+                    butaca.classList.add('ocupada');
+                    butaca.title = "Ocupado";
+                } else {
+                    butaca.onclick = () => toggleButaca(butaca, nombreAsiento);
+                }
+                filaDiv.appendChild(butaca);
+            }
+            contenedor.appendChild(filaDiv);
+        }
+    }
+
+    function toggleButaca(elemento, idAsiento) {
+        if (elemento.classList.contains('seleccionada')) {
+            elemento.classList.remove('seleccionada');
+            carrito = carrito.filter(item => item.id !== idAsiento);
+        } else {
+            elemento.classList.add('seleccionada');
+            carrito.push({ id: idAsiento, tipo: 'normal' });
+        }
+        renderizarCarrito();
+    }
+
+    function renderizarCarrito() {
+        const lista = document.getElementById('listaEntradas');
+        const totalDisplay = document.getElementById('precioTotal');
+        const salaActual = document.getElementById('selectSala').value; 
+
+        lista.innerHTML = "";
+        let total = 0;
+        let extraSala = 0;
+        if (salaActual === "Sala 2") extraSala = RECARGO_3D;
+        if (salaActual === "Sala 3") extraSala = RECARGO_4D;
+
+        if (carrito.length === 0) {
+            lista.innerHTML = '<p class="text-center text-muted mt-4">Selecciona butacas en el mapa</p>';
+            totalDisplay.innerText = "$0";
+            return;
+        }
+
+        carrito.sort((a, b) => a.id.localeCompare(b.id));
+
+        carrito.forEach(item => {
+            const precioBase = PRECIOS_BASE[item.tipo];
+            const precioFinal = precioBase + extraSala;
+            total += precioFinal;
+            
+            const div = document.createElement('div');
+            div.classList.add('item-entrada');
+            div.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-primary"><i class="bi bi-ticket-fill"></i> ${item.id}</span>
+                    <span class="fw-bold">$${precioFinal}</span>
+                </div>
+                <div class="mt-2">
+                    <select class="form-select form-select-sm" onchange="cambiarTipo('${item.id}', this.value)">
+                        <option value="normal" ${item.tipo === 'normal' ? 'selected' : ''}>Normal</option>
+                        <option value="jubilado" ${item.tipo === 'jubilado' ? 'selected' : ''}>Jubilado</option>
+                        <option value="nino" ${item.tipo === 'nino' ? 'selected' : ''}>Niño</option>
+                    </select>
+                </div>
+            `;
+            lista.appendChild(div);
+        });
+        totalDisplay.innerText = `$${total}`;
+    }
+
+    function cambiarTipo(id, tipo) {
+        const item = carrito.find(i => i.id === id);
+        if(item) item.tipo = tipo;
+        renderizarCarrito();
+    }
+
+    function procesarCompra() {
+        if (carrito.length === 0) {
+            alert("Selecciona al menos una entrada.");
+            return;
+        }
+        
+        const peli = document.getElementById('selectPelicula').value;
+        const complejo = document.getElementById('selectComplejo').value;
+        const sala = document.getElementById('selectSala').value;
+        const fecha = document.getElementById('inputFecha').value;
+        const hora = document.getElementById('selectHora').value;
+        
+        const totalTexto = document.getElementById('precioTotal').innerText;
+        const totalNumerico = parseInt(totalTexto.replace('$', ''));
+
+        if(confirm(`¿Confirmar compra para ${peli} (${sala})?\nTotal: ${totalTexto}`)) {
+            
+            // 1. Actualizar Asientos Ocupados
+            const todasLasReservas = JSON.parse(localStorage.getItem(STORAGE_RESERVAS)) || {};
+            let ocupadosEstaFuncion = todasLasReservas[idFuncionActual] || [];
+            const nuevosAsientos = carrito.map(c => c.id);
+            ocupadosEstaFuncion = ocupadosEstaFuncion.concat(nuevosAsientos);
+            todasLasReservas[idFuncionActual] = ocupadosEstaFuncion;
+            localStorage.setItem(STORAGE_RESERVAS, JSON.stringify(todasLasReservas));
+
+            // 2. Guardar en Historial de Ventas (Reportes)
+            const usuario = JSON.parse(localStorage.getItem('usuarioLogueado')).nombre;
+            const nuevaVenta = {
+                fechaCompra: new Date().toLocaleString(),
+                usuario: usuario,
+                pelicula: peli,
+                complejo: complejo,
+                sala: sala,
+                funcionFecha: fecha,
+                funcionHora: hora,
+                cantidad: carrito.length,
+                total: totalNumerico
+            };
+
+            const historial = JSON.parse(localStorage.getItem(STORAGE_VENTAS)) || [];
+            historial.push(nuevaVenta);
+            localStorage.setItem(STORAGE_VENTAS, JSON.stringify(historial));
+
+            alert("¡Compra Exitosa! Ticket generado.");
+            window.location.href = "index.html";
+        }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
